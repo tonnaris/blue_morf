@@ -11,7 +11,7 @@ import time
 import signal
 import numpy as np
 def main():
-    global motion,speed,joy_start,pub
+    global motion,speed,pub
     pub = rospy.Publisher('arduino_control', Float32MultiArray, queue_size=1)
     pub_dynamixel = rospy.Publisher('set_position', Int32MultiArray, queue_size=1)
     rospy.init_node('main', anonymous=True)
@@ -23,12 +23,14 @@ def main():
     dynamixel_positon = [0]*19 
     motion = "set"
     speed = "sigma"
-    sigma = 0.06
-    joy_start = True
-    arduino_start = True
+    sigma = 0.04
+    timer = True
     time_t0 = time.perf_counter()
-    set_duration = 0.3
+    
     arduino_control = [0,0]
+
+    gamma = 100 # set time 
+    set_duration = 0.5 # set percentage open and close valve
 
     delay = Delay()
     delay.set_w(0.8,5)
@@ -41,44 +43,50 @@ def main():
 
         if motion == "set":
             dynamixel_positon = mapping.map([0,0,0,1,1]) 
+            cpg = CPG()
+            sigma = 0.04
+            cpg.set_frequency(sigma * np.pi)
             cpg.set_frequency()
-        elif motion == "stop":
-            dynamixel_positon = mapping.map([cpg_data[0],cpg_data[1],-cpg_data[1],1,1])
+
         elif motion == "forward":
             dynamixel_positon = mapping.map([cpg_data[0],cpg_data[1],-cpg_data[1],1,1])
+        elif motion == "backward":
+            dynamixel_positon = mapping.map([-cpg_data[0],cpg_data[1],-cpg_data[1],1,1])
         elif motion == "left":
             dynamixel_positon = mapping.map([cpg_data[0],cpg_data[1],-cpg_data[1],-1,1])
         elif motion == "right":
             dynamixel_positon = mapping.map([cpg_data[0],cpg_data[1],-cpg_data[1],1,-1])
         
+
         if speed == "+sigma":
-            sigma += 0.01
-            if sigma >= 0.1: sigma = 0.1
+            sigma += 0.0001
+            if sigma >= 0.06: sigma = 0.06
             cpg.set_frequency(sigma * np.pi)
         elif speed == "-sigma":
-            sigma -= 0.01
+            sigma -= 0.0001
             if sigma <= 0.01: sigma = 0.01
             cpg.set_frequency(sigma * np.pi)
+  
         
-        print(sigma)
+        print("%.4f"%sigma)
 
         
-        if motion == "stop" or motion == "set":
+        if motion == "set":
             arduino_control = [0,0]
             time_t0 = time.perf_counter()
         else:
-            arduino_time = sigma * 100
+            arduino_time = sigma * gamma
 
             time_t1 = time.perf_counter()
             count_time = time_t1 - time_t0
 
-            if arduino_start == True and count_time * set_duration >= arduino_time:
+            if timer == True and count_time * set_duration >= arduino_time:
                 arduino_control = [1,1]
-                arduino_start = False
+                timer = False
                 time_t0 = time_t1
-            elif arduino_start == False and count_time * (1-set_duration) >= arduino_time:
+            elif timer == False and count_time * (1-set_duration) >= arduino_time:
                 arduino_control = [0,0]
-                arduino_start = True
+                timer = True
                 time_t0 = time_t1
 
                 
@@ -103,13 +111,10 @@ def main():
         signal.signal(signal.SIGINT, keyboard_interrupt_handler)   
 
 def joy_cb(msg):
-    global motion,speed,joy_start
+    global motion,speed
     # print(msg.buttons)
     #print(msg.axes)
 
-    if joy_start == True: 
-        button_before = msg.buttons
-        joy_start == False  
 
     if msg.buttons[7] == 1:
         motion = "set"
@@ -117,6 +122,8 @@ def joy_cb(msg):
         motion = "stop"
     elif msg.axes[1] == 1:
         motion = "forward"
+    elif msg.axes[1] == -1:
+        motion = "backward"
     elif msg.axes[0] == 1:
         motion ="left"
     elif msg.axes[0] == -1:
@@ -129,12 +136,13 @@ def joy_cb(msg):
     # else:
     #     speed = "sigma"
 
-    if  msg.buttons[3] == 1:
+    if  msg.buttons[3] == 1 :
         speed = "+sigma"
-    elif  msg.buttons[0] == 1:
+    elif  msg.buttons[0] == 1 :
         speed = "-sigma"
     else:
         speed = "sigma"
+
 
     button_before = msg.buttons
 
