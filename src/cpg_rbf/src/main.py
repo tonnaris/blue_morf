@@ -29,8 +29,8 @@ def main():
     
     arduino_control = [0,0]
 
-    gamma = 100 # set time 
-    set_duration = 0.5 # set percentage open and close valve
+    gamma = 150 # set time 
+    set_duration = 0.3 # set percentage open and close valve --> 0.3 open 0.7 close
 
     delay = Delay()
     delay.set_w(0.8,5)
@@ -68,23 +68,23 @@ def main():
             cpg.set_frequency(sigma * np.pi)
   
         
-        print("%.4f"%sigma)
+        print("sigma %.4f"%sigma)
 
         
         if motion == "set":
             arduino_control = [0,0]
             time_t0 = time.perf_counter()
         else:
-            arduino_time = sigma * gamma
+            arduino_time = (0.1-sigma) * gamma
 
             time_t1 = time.perf_counter()
             count_time = time_t1 - time_t0
 
-            if timer == True and count_time * set_duration >= arduino_time:
+            if timer == True and count_time  >= arduino_time * set_duration:
                 arduino_control = [1,1]
                 timer = False
                 time_t0 = time_t1
-            elif timer == False and count_time * (1-set_duration) >= arduino_time:
+            elif timer == False and count_time  >= arduino_time * (1-set_duration):
                 arduino_control = [0,0]
                 timer = True
                 time_t0 = time_t1
@@ -100,14 +100,7 @@ def main():
         arduino_control_data.data = arduino_control
         pub.publish(arduino_control_data)
         rate.sleep()
-        #rospy.spin()
-        
-        # else:
-        #     print("Stop")
-        #     arduino_control = [0,0]
-        #     arduino_control_data = Float32MultiArray()
-        #     arduino_control_data.data = arduino_control
-        #     pub.publish(arduino_control_data)
+
         signal.signal(signal.SIGINT, keyboard_interrupt_handler)   
 
 def joy_cb(msg):
@@ -129,12 +122,6 @@ def joy_cb(msg):
     elif msg.axes[0] == -1:
         motion ="right"
 
-    # if  msg.buttons[3] == 1 and msg.buttons[3] - button_before[3] == 1:
-    #     speed = "+sigma"
-    # elif  msg.buttons[0] == 1 and msg.buttons[0] - button_before[0] == 1:
-    #     speed = "-sigma"
-    # else:
-    #     speed = "sigma"
 
     if  msg.buttons[3] == 1 :
         speed = "+sigma"
