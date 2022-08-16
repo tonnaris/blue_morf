@@ -3,10 +3,10 @@
 import rospy
 from math import fabs
 from dynamixel_msgs.msg import JointState
-from std_msgs.msg import Float64
+from std_msgs.msg import Float64MultiArray
 
 goal_pos = 0;
-pub = rospy.Publisher('frequency', Float64)
+pub = rospy.Publisher('frequency', Float64MultiArray)
 
 def transform_callback(data):
     global goal_pos

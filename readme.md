@@ -27,8 +27,10 @@ git reset --hard HEAD
 git pull
 ```
 
-after pull delete all file in devel and build file, then run
+after pull delete all file in devel and build file
 ```
+sudo rm -r catkin_ws/build/*
+sudo rm -r catkin_ws/devel/*
 catkin_make
 ```
 
@@ -36,7 +38,7 @@ catkin_make
 ```
 roscore 
 rosrun cpg_rbf dynamixel_node.py
-rosrun rosserial_python serial_node.py /dev/ttyACM0
+rosrun rosserial_python serial_node.py /dev/ttyACM0 _baud:=115200
 rosrun joy joy_node
 rosrun cpg_rbf main.py 
 ```
