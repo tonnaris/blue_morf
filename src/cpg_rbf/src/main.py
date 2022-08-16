@@ -23,13 +23,12 @@ def main():
     dynamixel_positon = [0]*19 
     motion = "set"
     speed = "sigma"
-    sigma = 0.04
-    timer = True
-    time_t0 = time.perf_counter()
-    
+    sigma = 0.03
+    timer_state = True
+    time_t0 = time.perf_counter() # seconds
     arduino_control = [0,0]
 
-    gamma = 150 # set time 
+    gamma = 100 # set time 
     set_duration = 0.3 # set percentage open and close valve --> 0.3 open 0.7 close
 
     delay = Delay()
@@ -44,9 +43,7 @@ def main():
         if motion == "set":
             dynamixel_positon = mapping.map([0,0,0,1,1]) 
             cpg = CPG()
-            sigma = 0.04
             cpg.set_frequency(sigma * np.pi)
-            cpg.set_frequency()
 
         elif motion == "forward":
             dynamixel_positon = mapping.map([cpg_data[0],cpg_data[1],-cpg_data[1],1,1])
@@ -80,13 +77,13 @@ def main():
             time_t1 = time.perf_counter()
             count_time = time_t1 - time_t0
 
-            if timer == True and count_time  >= arduino_time * set_duration:
+            if timer_state == True and count_time  >= arduino_time * set_duration:
                 arduino_control = [1,1]
-                timer = False
+                timer_state = False
                 time_t0 = time_t1
-            elif timer == False and count_time  >= arduino_time * (1-set_duration):
+            elif timer_state == False and count_time  >= arduino_time * (1-set_duration):
                 arduino_control = [0,0]
-                timer = True
+                timer_state = True
                 time_t0 = time_t1
 
                 

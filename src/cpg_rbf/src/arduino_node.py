@@ -12,7 +12,6 @@ def transform_callback(data):
     global goal_pos
 
     pressure = data.data
-    
     pub.publish(Float64(goal_pos))
 
 
