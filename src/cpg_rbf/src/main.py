@@ -27,9 +27,10 @@ def main():
     timer_state = True
     time_t0 = time.perf_counter() # seconds
     arduino_control = [0,0]
+    signal_leg = [0,0,0,0,0]
+    count_change = 1
 
-    gamma = 100 # set time 
-    set_duration = 0.3 # set percentage open and close valve --> 0.3 open 0.7 close
+    set_duration = 0.5 # set percentage open and close valve --> 0.3 open 0.7 close
 
     delay = Delay()
     delay.set_w(0.8,5)
@@ -37,23 +38,54 @@ def main():
 
         rospy.Subscriber('joy', Joy, joy_cb, queue_size=1)
         
-        if motion != "stop" and motion != "set":
-            cpg_data = cpg.update()
+
 
         if motion == "set":
             dynamixel_positon = mapping.map([0,0,0,1,1]) 
             cpg = CPG()
             cpg.set_frequency(sigma * np.pi)
-
         elif motion == "forward":
-            dynamixel_positon = mapping.map([cpg_data[0],cpg_data[1],-cpg_data[1],1,1])
+            signal_leg[0] = cpg_data[0]
+            signal_leg[1] = cpg_data[1] 
+            signal_leg[2] = -cpg_data[1]
+            signal_leg[3] = 1
+            signal_leg[4] = 1
         elif motion == "backward":
-            dynamixel_positon = mapping.map([-cpg_data[0],cpg_data[1],-cpg_data[1],1,1])
+            signal_leg[0] = -cpg_data[0]
+            signal_leg[1] = cpg_data[1] 
+            signal_leg[2] = -cpg_data[1]
+            signal_leg[3] = 1
+            signal_leg[4] = 1
         elif motion == "left":
-            dynamixel_positon = mapping.map([cpg_data[0],cpg_data[1],-cpg_data[1],-1,1])
+            signal_leg[0] = cpg_data[0]
+            signal_leg[1] = cpg_data[1] 
+            signal_leg[2] = -cpg_data[1]
+            signal_leg[3] = -1
+            signal_leg[4] = 1
         elif motion == "right":
-            dynamixel_positon = mapping.map([cpg_data[0],cpg_data[1],-cpg_data[1],1,-1])
-        
+            signal_leg[0] = cpg_data[0]
+            signal_leg[1] = cpg_data[1] 
+            signal_leg[2] = -cpg_data[1]
+            signal_leg[3] = 1
+            signal_leg[4] = -1
+        elif motion == "stop":
+            if count_change > 0:
+                signal_leg[0] *= count_change
+                signal_leg[1] *= count_change
+                signal_leg[2] *= count_change
+                count_change -= 0.01
+
+
+
+        if motion != "stop" and motion != "set":
+            if count_change < 1:
+                signal_leg[0] *= count_change
+                signal_leg[1] *= count_change
+                signal_leg[2] *= count_change
+                count_change += 0.01
+            dynamixel_positon = mapping.map([signal_leg[0],signal_leg[1],signal_leg[2],signal_leg[3],signal_leg[4]])
+            cpg_data = np.array(cpg.update())
+
 
         if speed == "+sigma":
             sigma += 0.0001
@@ -67,21 +99,25 @@ def main():
         
         print("sigma %.4f"%sigma)
 
-        
         if motion == "set":
             arduino_control = [0,0]
             time_t0 = time.perf_counter()
+            gamma = 5
+        if motion == "stop":
+            gamma -= 0.002
         else:
-            arduino_time = (0.1-sigma) * gamma
+            gamma += 0.001
+            if gamma >= 10:
+                gamma = 10
 
             time_t1 = time.perf_counter()
             count_time = time_t1 - time_t0
 
-            if timer_state == True and count_time  >= arduino_time * set_duration:
+            if timer_state == True and count_time  >= gamma * set_duration:
                 arduino_control = [1,1]
                 timer_state = False
                 time_t0 = time_t1
-            elif timer_state == False and count_time  >= arduino_time * (1-set_duration):
+            elif timer_state == False and count_time  >= gamma * (1-set_duration):
                 arduino_control = [0,0]
                 timer_state = True
                 time_t0 = time_t1
@@ -108,6 +144,7 @@ def joy_cb(msg):
 
     if msg.buttons[7] == 1:
         motion = "set"
+        count_motion = 0
     if msg.buttons[1] == 1:
         motion = "stop"
     elif msg.axes[1] == 1:
@@ -119,6 +156,19 @@ def joy_cb(msg):
     elif msg.axes[0] == -1:
         motion ="right"
 
+    if msg.buttons[5] == 1 :
+        if count < 100:
+            motion = "forward"
+        elif count < 200:
+            motion = "stop"
+        elif count < 300: 
+            motion ="right"
+        elif count < 400:
+            motion = "forward"
+        elif count < 500:
+            motion = "stop"
+        count_motion +=1
+    
 
     if  msg.buttons[3] == 1 :
         speed = "+sigma"

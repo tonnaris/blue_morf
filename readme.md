@@ -1,5 +1,8 @@
 # This code for ubuntu 20.04 and ros noetic
 
+# Rpi
+Username: Ubuntu 
+Password: 123456789
 # install package
 ```
 sudo apt-get install ros-neotic-rosserial-pyhton
@@ -13,7 +16,6 @@ sudo apt-get install ros-neotic-rosserial-joy
 # Git
 
 git Username : tonnaris
-
 git Password : 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
 ## git push
 ```

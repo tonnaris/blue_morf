@@ -12,14 +12,14 @@ def transform_callback(data):
     global goal_pos
 
     pressure = data.data
-    pub.publish(Float64(goal_pos))
+    pub.publish(Float64MultiArray(goal_pos))
 
 
 def dxl_control():
     rospy.init_node('dxl_control', anonymous=True)
     rospy.Subscriber('/tilt_controller/state', JointState, transform_callback).
     # Initial movement.
-    pub.publish(Float64(goal_pos))
+    pub.publish(Float64MultiArray(goal_pos))
     rospy.spin()
 
 
