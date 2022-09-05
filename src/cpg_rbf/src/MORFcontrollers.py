@@ -122,10 +122,6 @@ class Motormapping_angle():
 
         
     def map(self,control_input):
-        control_input[0] = cpg_0
-        control_input[1] = cpg_1
-        control_input[2] = cpg_2
-
 
         leg0 = [ int(self.output_tjoint[0] + self.slope_tjoint * (control_input[0] - self.input[0])), 
                 int(self.output_cjoint[1] + self.slope_cjoint * (Relu(-control_input[1]*control_input[3]) - self.input[0])),
