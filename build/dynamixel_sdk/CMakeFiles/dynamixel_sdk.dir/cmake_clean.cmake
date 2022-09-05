@@ -1,6 +1,6 @@
 file(REMOVE_RECURSE
-  "/home/naris/catkin_ws/devel/lib/libdynamixel_sdk.pdb"
-  "/home/naris/catkin_ws/devel/lib/libdynamixel_sdk.so"
+  "/home/ubuntu/catkin_ws/devel/lib/libdynamixel_sdk.pdb"
+  "/home/ubuntu/catkin_ws/devel/lib/libdynamixel_sdk.so"
   "CMakeFiles/dynamixel_sdk.dir/src/dynamixel_sdk/group_bulk_read.cpp.o"
   "CMakeFiles/dynamixel_sdk.dir/src/dynamixel_sdk/group_bulk_write.cpp.o"
   "CMakeFiles/dynamixel_sdk.dir/src/dynamixel_sdk/group_sync_read.cpp.o"

@@ -24,6 +24,7 @@ def main():
     TORQUE = 0
     dynamixel_positon = [0]*19 
     motion = "set"
+    motion_before = "set"
     speed = "sigma"
     sigma = 0.03
     alpha = 0.03
@@ -31,7 +32,7 @@ def main():
     time_t0 = time.perf_counter() # seconds
     arduino_control = [0,0]
     signal_leg = [0,0,0,0,0]
-    count_change = 1
+    count_change = 0
 
     set_duration = 0.5 # set percentage open and close valve --> 0.3 open 0.7 close
 
@@ -42,8 +43,18 @@ def main():
         rospy.Subscriber('joy', Joy, joy_cb, queue_size=1)
         
 
+        if motion != "set":
+            if motion != "stop" and count_change < 1:
+                signal_leg[0] *= count_change
+                signal_leg[1] *= count_change
+                signal_leg[2] *= count_change
+                count_change += 0.005
+            dynamixel_positon = mapping.map([signal_leg[0],signal_leg[1],signal_leg[2],signal_leg[3],signal_leg[4]])
+            cpg_walk_data = np.array(cpg_walk.update())
 
         if motion == "set":
+            count_change = 0
+            sigma = 0.03
             dynamixel_positon = mapping.map([0,0,0,1,1]) 
             cpg_walk = CPG()
             cpg_walk.set_frequency(sigma * np.pi)
@@ -63,35 +74,44 @@ def main():
             signal_leg[0] = cpg_walk_data[0]
             signal_leg[1] = cpg_walk_data[1] 
             signal_leg[2] = -cpg_walk_data[1]
-            signal_leg[3] = 0.7
+            signal_leg[3] = 0.5
             signal_leg[4] = 1
-            # signal_leg[3] = -1
-            # signal_leg[4] = 1
         elif motion == "right":
             signal_leg[0] = cpg_walk_data[0]
             signal_leg[1] = cpg_walk_data[1] 
             signal_leg[2] = -cpg_walk_data[1]
             signal_leg[3] = 1
-            signal_leg[4] = 0.7
-            # signal_leg[3] = 1
-            # signal_leg[4] = -1
+            signal_leg[4] = 0.5
         elif motion == "stop":
             if count_change > 0:
-                signal_leg[0] *= count_change
-                signal_leg[1] *= count_change
-                signal_leg[2] *= count_change
-                count_change -= 0.01
+                count_change -= 0.005
+                if motion_before == "forward":
+                    signal_leg[0] = cpg_walk_data[0] * count_change
+                    signal_leg[1] = cpg_walk_data[1] * count_change
+                    signal_leg[2] = -cpg_walk_data[1]* count_change
+                    signal_leg[3] = 1
+                    signal_leg[4] = 1
+                elif motion_before == "backward":
+                    signal_leg[0] = -cpg_walk_data[0]* count_change
+                    signal_leg[1] = cpg_walk_data[1] * count_change
+                    signal_leg[2] = -cpg_walk_data[1]* count_change
+                    signal_leg[3] = 1
+                    signal_leg[4] = 1
+                elif motion_before == "left":
+                    signal_leg[0] = cpg_walk_data[0]* count_change
+                    signal_leg[1] = cpg_walk_data[1] * count_change
+                    signal_leg[2] = -cpg_walk_data[1]* count_change
+                    signal_leg[3] = 0.5
+                    signal_leg[4] = 1
+                elif motion_before == "right":
+                    signal_leg[0] = cpg_walk_data[0]* count_change
+                    signal_leg[1] = cpg_walk_data[1] * count_change
+                    signal_leg[2] = -cpg_walk_data[1]* count_change
+                    signal_leg[3] = 1
+                    signal_leg[4] = 0.5
+        if motion != "stop":
+            motion_before = motion
 
-
-
-        if motion != "stop" and motion != "set":
-            if count_change < 1:
-                signal_leg[0] *= count_change
-                signal_leg[1] *= count_change
-                signal_leg[2] *= count_change
-                count_change += 0.01
-            dynamixel_positon = mapping.map([signal_leg[0],signal_leg[1],signal_leg[2],signal_leg[3],signal_leg[4]])
-            cpg_walk_data = np.array(cpg_walk.update())
 
 
         if speed == "+sigma":
@@ -102,40 +122,48 @@ def main():
             sigma -= 0.0001
             if sigma <= 0.01: sigma = 0.01
             cpg_walk.set_frequency(sigma * np.pi)
-  
-        
+
+        print(motion)
+        print("count_change %.4f"%count_change)
         print("sigma %.4f"%sigma)
-        learning_rate = 0.01
-        forgeting_rate = 0.01
-        if motion == "stop"
-            state = 0
-        else
-            state = 1
-        alpha = (learning_rate * state * (sigma + alpha)) + (forgeting_rate * (state-1) * (alpha**2))
+        # learning_rate = 0.01
+        # forgeting_rate = 0.01
+        # if motion == "stop":
+        #     state = 0
+        # else
+        #     state = 1
+        # alpha = (learning_rate * state * (sigma + alpha)) + (forgeting_rate * (state-1) * (alpha**2))
 
         if motion == "set":
             arduino_control = [0,0]
+            alpha = 0.05
+            time_t0 = time.perf_counter()
             cpg_breathe = CPG()
             cpg_breathe.set_frequency()
         elif motion == "stop":
-            alpha -= 0.002
+            alpha -= 0.00002
+            if alpha <= 0.01:
+                alpha = 0.01
+            alpha = 0.05
             cpg_breathe.set_frequency(alpha * np.pi)
         else:
-            gamma += 0.001
+            alpha += 0.00001
             if alpha >= 0.1:
                 alpha = 0.1
+            alpha = 0.05
             cpg_breathe.set_frequency(alpha * np.pi)
 
         if motion != "set":
-            cpg_breathe_data = np.array(cpg_breathe.update())
-            if timer_state == True and cpg_breathe_data > 0:
+            cpg_breathe_data = np.array(cpg_breathe.update())[0]
+            if timer_state == True and cpg_breathe_data >= 0:
                 arduino_control = [1,0]
                 timer_state = False
-                time_t0 = time_t1
+                print("----------------------------------------------------")
+                print(time.perf_counter()-time_t0)
+                time_t0 = time.perf_counter()
             elif timer_state == False and cpg_breathe_data < 0:
                 arduino_control = [0,1]
                 timer_state = True
-                time_t0 = time_t1
 
 
 

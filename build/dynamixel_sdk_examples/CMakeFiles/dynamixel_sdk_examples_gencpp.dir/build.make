@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/naris/catkin_ws/src
+CMAKE_SOURCE_DIR = /home/ubuntu/catkin_ws/src
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/naris/catkin_ws/build
+CMAKE_BINARY_DIR = /home/ubuntu/catkin_ws/build
 
 # Utility rule file for dynamixel_sdk_examples_gencpp.
 
@@ -63,10 +63,10 @@ dynamixel_sdk_examples/CMakeFiles/dynamixel_sdk_examples_gencpp.dir/build: dynam
 .PHONY : dynamixel_sdk_examples/CMakeFiles/dynamixel_sdk_examples_gencpp.dir/build
 
 dynamixel_sdk_examples/CMakeFiles/dynamixel_sdk_examples_gencpp.dir/clean:
-	cd /home/naris/catkin_ws/build/dynamixel_sdk_examples && $(CMAKE_COMMAND) -P CMakeFiles/dynamixel_sdk_examples_gencpp.dir/cmake_clean.cmake
+	cd /home/ubuntu/catkin_ws/build/dynamixel_sdk_examples && $(CMAKE_COMMAND) -P CMakeFiles/dynamixel_sdk_examples_gencpp.dir/cmake_clean.cmake
 .PHONY : dynamixel_sdk_examples/CMakeFiles/dynamixel_sdk_examples_gencpp.dir/clean
 
 dynamixel_sdk_examples/CMakeFiles/dynamixel_sdk_examples_gencpp.dir/depend:
-	cd /home/naris/catkin_ws/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/naris/catkin_ws/src /home/naris/catkin_ws/src/dynamixel_sdk_examples /home/naris/catkin_ws/build /home/naris/catkin_ws/build/dynamixel_sdk_examples /home/naris/catkin_ws/build/dynamixel_sdk_examples/CMakeFiles/dynamixel_sdk_examples_gencpp.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/ubuntu/catkin_ws/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/ubuntu/catkin_ws/src /home/ubuntu/catkin_ws/src/dynamixel_sdk_examples /home/ubuntu/catkin_ws/build /home/ubuntu/catkin_ws/build/dynamixel_sdk_examples /home/ubuntu/catkin_ws/build/dynamixel_sdk_examples/CMakeFiles/dynamixel_sdk_examples_gencpp.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : dynamixel_sdk_examples/CMakeFiles/dynamixel_sdk_examples_gencpp.dir/depend
 

@@ -1,8 +1,0 @@
-prefix=/home/naris/catkin_ws/install
-
-Name: CPG_RBF
-Description: Description of CPG_RBF
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 

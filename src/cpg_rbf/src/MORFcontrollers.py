@@ -123,28 +123,28 @@ class Motormapping_angle():
         
     def map(self,control_input):
 
-        leg0 = [ int(self.output_tjoint[0] + self.slope_tjoint * (control_input[0] - self.input[0])), 
-                int(self.output_cjoint[1] + self.slope_cjoint * (Relu(-control_input[1]*control_input[3]) - self.input[0])),
+        leg0 = [ int(self.output_tjoint[0] + self.slope_tjoint * (control_input[0]*control_input[3] - self.input[0])), 
+                int(self.output_cjoint[1] + self.slope_cjoint * (Relu(-control_input[1]) - self.input[0])),
                 int(self.output_fjoint[0] + self.slope_fjoint * (Relu(control_input[2]) - self.input[0]))]
 
-        leg1 = [ int(self.output_tjoint[0] + self.slope_tjoint * (-control_input[0] - self.input[0])), 
-                int(self.output_cjoint[1] + self.slope_cjoint * (Relu(control_input[1]*control_input[3]) - self.input[0])),
+        leg1 = [ int(self.output_tjoint[0] + self.slope_tjoint * (-control_input[0]*control_input[3] - self.input[0])), 
+                int(self.output_cjoint[1] + self.slope_cjoint * (Relu(control_input[1]) - self.input[0])),
                 int(self.output_fjoint[0] + self.slope_fjoint * (Relu(-control_input[2]) - self.input[0]))]
 
-        leg2 = [ int(self.output_tjoint[0] + self.slope_tjoint * (control_input[0] - self.input[0])), 
-                int(self.output_cjoint[1] + self.slope_cjoint * (Relu(-control_input[1]*control_input[3]) - self.input[0])),
+        leg2 = [ int(self.output_tjoint[0] + self.slope_tjoint * (control_input[0]*control_input[3] - self.input[0])), 
+                int(self.output_cjoint[1] + self.slope_cjoint * (Relu(-control_input[1]) - self.input[0])),
                 int(self.output_fjoint[0] + self.slope_fjoint * (Relu(control_input[2]) - self.input[0]))]
 
-        leg3 = [ int(self.output_tjoint[0] + self.slope_tjoint * (control_input[0] - self.input[0])), 
-                int(self.output_cjoint[1] + self.slope_cjoint * (Relu(control_input[1]*control_input[4]) - self.input[0])),
+        leg3 = [ int(self.output_tjoint[0] + self.slope_tjoint * (control_input[0]*control_input[4] - self.input[0])), 
+                int(self.output_cjoint[1] + self.slope_cjoint * (Relu(control_input[1]) - self.input[0])),
                 int(self.output_fjoint[0] + self.slope_fjoint * (Relu(-control_input[2]) - self.input[0]))]
 
-        leg4 = [ int(self.output_tjoint[0] + self.slope_tjoint * (-control_input[0] - self.input[0])), 
-                int(self.output_cjoint[1] + self.slope_cjoint * (Relu(-control_input[1]*control_input[4]) - self.input[0])),
+        leg4 = [ int(self.output_tjoint[0] + self.slope_tjoint * (-control_input[0]*control_input[4] - self.input[0])), 
+                int(self.output_cjoint[1] + self.slope_cjoint * (Relu(-control_input[1]) - self.input[0])),
                 int(self.output_fjoint[0] + self.slope_fjoint * (Relu(control_input[2]) - self.input[0]))]
 
-        leg5 = [ int(self.output_tjoint[0] + self.slope_tjoint * (control_input[0] - self.input[0])), 
-                int(self.output_cjoint[1] + self.slope_cjoint * (Relu(control_input[1]*control_input[4])- self.input[0])),
+        leg5 = [ int(self.output_tjoint[0] + self.slope_tjoint * (control_input[0]*control_input[4] - self.input[0])), 
+                int(self.output_cjoint[1] + self.slope_cjoint * (Relu(control_input[1])- self.input[0])),
                 int(self.output_fjoint[0] + self.slope_fjoint * (Relu(-control_input[2]) - self.input[0]))]
 
         return leg0 + leg1 + leg2 + leg3 + leg4 + leg5

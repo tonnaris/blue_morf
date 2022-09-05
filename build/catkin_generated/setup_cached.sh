@@ -7,4 +7,5 @@
 # new environment variables
 
 # modified environment variables
-export PWD='/home/naris/catkin_ws/build'
+export PWD='/home/ubuntu/catkin_ws/build'
+export ROS_PACKAGE_PATH='/home/naris/catkin_ws_test/src:/home/naris/catkin_ws/src:/home/ubuntu/catkin_ws/src:/opt/ros/noetic/share'

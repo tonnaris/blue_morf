@@ -1,11 +1,11 @@
 file(REMOVE_RECURSE
-  "/home/naris/catkin_ws/devel/share/roseus/ros/dynamixel_sdk_examples/manifest.l"
-  "/home/naris/catkin_ws/devel/share/roseus/ros/dynamixel_sdk_examples/msg/BulkSetItem.l"
-  "/home/naris/catkin_ws/devel/share/roseus/ros/dynamixel_sdk_examples/msg/SetPosition.l"
-  "/home/naris/catkin_ws/devel/share/roseus/ros/dynamixel_sdk_examples/msg/SyncSetPosition.l"
-  "/home/naris/catkin_ws/devel/share/roseus/ros/dynamixel_sdk_examples/srv/BulkGetItem.l"
-  "/home/naris/catkin_ws/devel/share/roseus/ros/dynamixel_sdk_examples/srv/GetPosition.l"
-  "/home/naris/catkin_ws/devel/share/roseus/ros/dynamixel_sdk_examples/srv/SyncGetPosition.l"
+  "/home/ubuntu/catkin_ws/devel/share/roseus/ros/dynamixel_sdk_examples/manifest.l"
+  "/home/ubuntu/catkin_ws/devel/share/roseus/ros/dynamixel_sdk_examples/msg/BulkSetItem.l"
+  "/home/ubuntu/catkin_ws/devel/share/roseus/ros/dynamixel_sdk_examples/msg/SetPosition.l"
+  "/home/ubuntu/catkin_ws/devel/share/roseus/ros/dynamixel_sdk_examples/msg/SyncSetPosition.l"
+  "/home/ubuntu/catkin_ws/devel/share/roseus/ros/dynamixel_sdk_examples/srv/BulkGetItem.l"
+  "/home/ubuntu/catkin_ws/devel/share/roseus/ros/dynamixel_sdk_examples/srv/GetPosition.l"
+  "/home/ubuntu/catkin_ws/devel/share/roseus/ros/dynamixel_sdk_examples/srv/SyncGetPosition.l"
   "CMakeFiles/dynamixel_sdk_examples_generate_messages_eus"
 )
 

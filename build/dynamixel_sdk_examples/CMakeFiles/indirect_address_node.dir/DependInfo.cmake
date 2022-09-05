@@ -4,7 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/naris/catkin_ws/src/dynamixel_sdk_examples/src/indirect_address_node.cpp" "/home/naris/catkin_ws/build/dynamixel_sdk_examples/CMakeFiles/indirect_address_node.dir/src/indirect_address_node.cpp.o"
+  "/home/ubuntu/catkin_ws/src/dynamixel_sdk_examples/src/indirect_address_node.cpp" "/home/ubuntu/catkin_ws/build/dynamixel_sdk_examples/CMakeFiles/indirect_address_node.dir/src/indirect_address_node.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
@@ -17,15 +17,15 @@ set(CMAKE_TARGET_DEFINITIONS_CXX
 
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
-  "/home/naris/catkin_ws/devel/include"
-  "/home/naris/catkin_ws/src/dynamixel_sdk/include"
+  "/home/ubuntu/catkin_ws/devel/include"
+  "/home/ubuntu/catkin_ws/src/dynamixel_sdk/include"
   "/opt/ros/noetic/include"
   "/opt/ros/noetic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp"
   )
 
 # Targets to which this target links.
 set(CMAKE_TARGET_LINKED_INFO_FILES
-  "/home/naris/catkin_ws/build/dynamixel_sdk/CMakeFiles/dynamixel_sdk.dir/DependInfo.cmake"
+  "/home/ubuntu/catkin_ws/build/dynamixel_sdk/CMakeFiles/dynamixel_sdk.dir/DependInfo.cmake"
   )
 
 # Fortran module output directory.

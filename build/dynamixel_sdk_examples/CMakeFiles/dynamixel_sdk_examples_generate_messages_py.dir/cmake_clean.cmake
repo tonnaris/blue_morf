@@ -1,12 +1,12 @@
 file(REMOVE_RECURSE
-  "/home/naris/catkin_ws/devel/lib/python3/dist-packages/dynamixel_sdk_examples/msg/_BulkSetItem.py"
-  "/home/naris/catkin_ws/devel/lib/python3/dist-packages/dynamixel_sdk_examples/msg/_SetPosition.py"
-  "/home/naris/catkin_ws/devel/lib/python3/dist-packages/dynamixel_sdk_examples/msg/_SyncSetPosition.py"
-  "/home/naris/catkin_ws/devel/lib/python3/dist-packages/dynamixel_sdk_examples/msg/__init__.py"
-  "/home/naris/catkin_ws/devel/lib/python3/dist-packages/dynamixel_sdk_examples/srv/_BulkGetItem.py"
-  "/home/naris/catkin_ws/devel/lib/python3/dist-packages/dynamixel_sdk_examples/srv/_GetPosition.py"
-  "/home/naris/catkin_ws/devel/lib/python3/dist-packages/dynamixel_sdk_examples/srv/_SyncGetPosition.py"
-  "/home/naris/catkin_ws/devel/lib/python3/dist-packages/dynamixel_sdk_examples/srv/__init__.py"
+  "/home/ubuntu/catkin_ws/devel/lib/python3/dist-packages/dynamixel_sdk_examples/msg/_BulkSetItem.py"
+  "/home/ubuntu/catkin_ws/devel/lib/python3/dist-packages/dynamixel_sdk_examples/msg/_SetPosition.py"
+  "/home/ubuntu/catkin_ws/devel/lib/python3/dist-packages/dynamixel_sdk_examples/msg/_SyncSetPosition.py"
+  "/home/ubuntu/catkin_ws/devel/lib/python3/dist-packages/dynamixel_sdk_examples/msg/__init__.py"
+  "/home/ubuntu/catkin_ws/devel/lib/python3/dist-packages/dynamixel_sdk_examples/srv/_BulkGetItem.py"
+  "/home/ubuntu/catkin_ws/devel/lib/python3/dist-packages/dynamixel_sdk_examples/srv/_GetPosition.py"
+  "/home/ubuntu/catkin_ws/devel/lib/python3/dist-packages/dynamixel_sdk_examples/srv/_SyncGetPosition.py"
+  "/home/ubuntu/catkin_ws/devel/lib/python3/dist-packages/dynamixel_sdk_examples/srv/__init__.py"
   "CMakeFiles/dynamixel_sdk_examples_generate_messages_py"
 )
 

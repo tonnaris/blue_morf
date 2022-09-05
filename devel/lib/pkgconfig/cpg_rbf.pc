@@ -1,4 +1,4 @@
-prefix=/home/naris/catkin_ws/devel
+prefix=/home/ubuntu/catkin_ws/devel
 
 Name: cpg_rbf
 Description: Description of cpg_rbf

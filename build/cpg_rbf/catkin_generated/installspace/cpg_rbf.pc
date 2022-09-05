@@ -1,4 +1,4 @@
-prefix=/home/naris/catkin_ws/install
+prefix=/home/ubuntu/catkin_ws/install
 
 Name: cpg_rbf
 Description: Description of cpg_rbf

@@ -1,4 +1,4 @@
-prefix=/home/naris/catkin_ws/install
+prefix=/home/ubuntu/catkin_ws/install
 
 Name: dynamixel_sdk
 Description: Description of dynamixel_sdk
