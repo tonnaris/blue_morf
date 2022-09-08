@@ -33,6 +33,8 @@ def main():
     arduino_control = [0,0]
     signal_leg = [0,0,0,0,0]
     count_change = 0
+    count_motion = 0
+    set_sequence = False
 
     set_duration = 0.5 # set percentage open and close valve --> 0.3 open 0.7 close
 
@@ -144,13 +146,13 @@ def main():
             alpha -= 0.00002
             if alpha <= 0.01:
                 alpha = 0.01
-            alpha = 0.05
+     
             cpg_breathe.set_frequency(alpha * np.pi)
         else:
             alpha += 0.00001
             if alpha >= 0.1:
                 alpha = 0.1
-            alpha = 0.05
+  
             cpg_breathe.set_frequency(alpha * np.pi)
 
         if motion != "set":
@@ -164,6 +166,8 @@ def main():
             elif timer_state == False and cpg_breathe_data < 0:
                 arduino_control = [0,1]
                 timer_state = True
+        
+        print("alpha %.4f"%alpha)
 
 
 
@@ -206,14 +210,13 @@ def main():
         signal.signal(signal.SIGINT, keyboard_interrupt_handler)   
 
 def joy_cb(msg):
-    global motion,speed
-    # print(msg.buttons)
+    global motion,speed,count_motion,set_sequence
+    #print(msg.buttons)
     #print(msg.axes)
 
 
     if msg.buttons[7] == 1:
         motion = "set"
-        count_motion = 0
     if msg.buttons[1] == 1:
         motion = "stop"
     elif msg.axes[1] == 1:
@@ -225,18 +228,31 @@ def joy_cb(msg):
     elif msg.axes[0] == -1:
         motion ="right"
 
-    if msg.buttons[5] == 1 :
-        if count < 100:
-            motion = "forward"
-        elif count < 200:
-            motion = "stop"
-        elif count < 300: 
-            motion ="right"
-        elif count < 400:
-            motion = "forward"
-        elif count < 500:
-            motion = "stop"
-        count_motion +=1
+    # if msg.buttons[7] == 1 or msg.buttons[1] == 1 or msg.axes[1] == 1 or msg.axes[1] == -1 or msg.axes[0] == 1 or msg.axes[0] == -1:
+    #     set_sequence = False
+    #     count_motion = 0
+
+    # if msg.buttons[5] == 1 :
+    #     set_sequence = True
+
+    # if set_sequence == True:
+    #     if count_motion < 1000:
+    #         motion = "forward"
+    #     elif count_motion < 2000:
+    #         motion = "stop"
+    #     elif count_motion < 3000: 
+    #         motion ="right"
+    #     elif count_motion < 4000:
+    #         motion = "forward"
+    #     elif count_motion < 5000:
+    #         motion = "stop"
+    #     else:
+    #         count_motion = 0
+
+    #     count_motion +=1
+
+    # print("count_motion")
+    # print(count_motion)
     
 
     if  msg.buttons[3] == 1 :
