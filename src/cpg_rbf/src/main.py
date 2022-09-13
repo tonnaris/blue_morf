@@ -28,13 +28,15 @@ def main():
     speed = "sigma"
     sigma = 0.03
     alpha = 0.03
-    timer_state = True
+    breathe_state_0 = True
+    breathe_state_1 = True
     time_t0 = time.perf_counter() # seconds
     arduino_control = [0,0]
     signal_leg = [0,0,0,0,0]
     count_change = 0
     count_motion = 0
     set_sequence = False
+    shif_cpg_breathe = 0
 
     set_duration = 0.5 # set percentage open and close valve --> 0.3 open 0.7 close
 
@@ -139,62 +141,48 @@ def main():
         if motion == "set":
             arduino_control = [0,0]
             alpha = 0.05
+            shif_cpg_breathe = 0
             time_t0 = time.perf_counter()
             cpg_breathe = CPG()
             cpg_breathe.set_frequency()
         elif motion == "stop":
             alpha -= 0.00002
-            if alpha <= 0.01:
-                alpha = 0.01
+            if alpha <= 0.01: alpha = 0.01
+            shif_cpg_breathe -= -= 0.00002
+            if shif_cpg_breathe <= 0: shif_cpg_breathe = 0
+            
      
             cpg_breathe.set_frequency(alpha * np.pi)
         else:
             alpha += 0.00001
-            if alpha >= 0.1:
-                alpha = 0.1
+            if alpha >= 0.1: alpha = 0.1
+            shif_cpg_breathe += 0.00001
+            if shif_cpg_breathe >= 0.8: shif_cpg_breathe = 0.8
   
             cpg_breathe.set_frequency(alpha * np.pi)
 
         if motion != "set":
-            cpg_breathe_data = np.array(cpg_breathe.update())[0]
-            if timer_state == True and cpg_breathe_data >= 0:
-                arduino_control = [1,0]
-                timer_state = False
+            cpg_breathe_data_0 = np.array(cpg_breathe.update())[0] + shif_cpg_breathe
+            cpg_breathe_data_1 = np.array(cpg_breathe.update())[1] + shif_cpg_breathe
+
+            if breathe_state_0 == True and cpg_breathe_data_0 >= 0:
+                arduino_control = [1,3]
+                breathe_state_0 = False
                 print("----------------------------------------------------")
                 print(time.perf_counter()-time_t0)
                 time_t0 = time.perf_counter()
-            elif timer_state == False and cpg_breathe_data < 0:
-                arduino_control = [0,1]
-                timer_state = True
+            elif breathe_state_0 == False and cpg_breathe_data_0 < 0:
+                arduino_control = [0,3]
+                breathe_state_0 = True
+
+            if breathe_state_1 == True and cpg_breathe_data_1 >= 0:
+                arduino_control = [3,0]
+                breathe_state_1 = False
+            elif breathe_state_1 == False and cpg_breathe_data_1 < 0:
+                arduino_control = [3,1]
+                breathe_state_1 = True
         
         print("alpha %.4f"%alpha)
-
-
-
-
-        # if motion == "set":
-        #     arduino_control = [0,0]
-        #     time_t0 = time.perf_counter()
-        #     gamma = 5
-        # if motion == "stop":
-        #     gamma -= 0.002
-        # else:
-        #     gamma += 0.001
-        #     if gamma >= 10:
-        #         gamma = 10
-
-        #     time_t1 = time.perf_counter()
-        #     count_time = time_t1 - time_t0
-
-        #     if timer_state == True and count_time  >= gamma * set_duration:
-        #         arduino_control = [1,1]
-        #         timer_state = False
-        #         time_t0 = time_t1
-        #     elif timer_state == False and count_time  >= gamma * (1-set_duration):
-        #         arduino_control = [0,0]
-        #         timer_state = True
-        #         time_t0 = time_t1
-
                 
         
 
@@ -246,9 +234,6 @@ def joy_cb(msg):
     #         motion = "forward"
     #     elif count_motion < 5000:
     #         motion = "stop"
-    #     else:
-    #         count_motion = 0
-
     #     count_motion +=1
 
     # print("count_motion")
