@@ -11,7 +11,7 @@ import time
 import signal
 import numpy as np
 def main():
-    global motion,speed,pub
+    global motion,speed,pub,count_motion,set_sequence
     pub = rospy.Publisher('arduino_control', Float32MultiArray, queue_size=1)
     pub_dynamixel = rospy.Publisher('set_position', Int32MultiArray, queue_size=1)
     rospy.init_node('main', anonymous=True)
@@ -27,7 +27,7 @@ def main():
     motion_before = "set"
     speed = "sigma"
     sigma = 0.03
-    alpha = 0.03
+    alpha = 0.01
     breathe_state_0 = True
     breathe_state_1 = True
     time_t0 = time.perf_counter() # seconds
@@ -45,6 +45,23 @@ def main():
     while not rospy.is_shutdown():
 
         rospy.Subscriber('joy', Joy, joy_cb, queue_size=1)
+
+        if set_sequence == True:
+            if count_motion < 1000:
+                motion = "forward"
+            elif count_motion < 1200:
+                motion = "stop"
+            elif count_motion < 2200: 
+                motion ="right"
+            elif count_motion < 2400:
+                motion = "stop"
+            elif count_motion < 3400:
+                motion = "forward"
+            elif count_motion < 3600:
+                motion = "stop"
+            count_motion +=1
+            print("count_motion: %d"%count_motion)
+
         
 
         if motion != "set":
@@ -127,9 +144,10 @@ def main():
             if sigma <= 0.01: sigma = 0.01
             cpg_walk.set_frequency(sigma * np.pi)
 
-        print(motion)
-        print("count_change %.4f"%count_change)
-        print("sigma %.4f"%sigma)
+
+        print("motion: %s"%motion)
+        print("count_change: %.4f"%count_change)
+        print("sigma: %.4f"%sigma)
         # learning_rate = 0.01
         # forgeting_rate = 0.01
         # if motion == "stop":
@@ -140,25 +158,26 @@ def main():
 
         if motion == "set":
             arduino_control = [0,0]
-            alpha = 0.05
-            shif_cpg_breathe = 0
+            alpha = 0.01
+            shif_cpg_breathe = 0.15
             time_t0 = time.perf_counter()
             cpg_breathe = CPG()
             cpg_breathe.set_frequency()
         elif motion == "stop":
             alpha -= 0.00002
             if alpha <= 0.01: alpha = 0.01
-            shif_cpg_breathe -= -= 0.00002
-            if shif_cpg_breathe <= 0: shif_cpg_breathe = 0
+            shif_cpg_breathe += 0.0002
+            if shif_cpg_breathe >= 0.15: shif_cpg_breathe = 0.15
+
             
      
             cpg_breathe.set_frequency(alpha * np.pi)
         else:
             alpha += 0.00001
             if alpha >= 0.1: alpha = 0.1
-            shif_cpg_breathe += 0.00001
-            if shif_cpg_breathe >= 0.8: shif_cpg_breathe = 0.8
-  
+            shif_cpg_breathe -= 0.0002
+            if shif_cpg_breathe <= 0: shif_cpg_breathe = 0
+
             cpg_breathe.set_frequency(alpha * np.pi)
 
         if motion != "set":
@@ -181,9 +200,10 @@ def main():
             elif breathe_state_1 == False and cpg_breathe_data_1 < 0:
                 arduino_control = [3,1]
                 breathe_state_1 = True
-        
+
+            print("cpg_breathe_data_0 %.4f"%cpg_breathe_data_0)
         print("alpha %.4f"%alpha)
-                
+        print("shif_cpg_breathe %.4f"%shif_cpg_breathe)       
         
 
         dynamixel_control_data = Int32MultiArray()
@@ -216,28 +236,14 @@ def joy_cb(msg):
     elif msg.axes[0] == -1:
         motion ="right"
 
-    # if msg.buttons[7] == 1 or msg.buttons[1] == 1 or msg.axes[1] == 1 or msg.axes[1] == -1 or msg.axes[0] == 1 or msg.axes[0] == -1:
-    #     set_sequence = False
-    #     count_motion = 0
+    if msg.buttons[7] == 1 or msg.buttons[1] == 1 or msg.axes[1] == 1 or msg.axes[1] == -1 or msg.axes[0] == 1 or msg.axes[0] == -1:
+        set_sequence = False
+        count_motion = 0
 
-    # if msg.buttons[5] == 1 :
-    #     set_sequence = True
+    if msg.buttons[5] == 1 :
+        set_sequence = True
 
-    # if set_sequence == True:
-    #     if count_motion < 1000:
-    #         motion = "forward"
-    #     elif count_motion < 2000:
-    #         motion = "stop"
-    #     elif count_motion < 3000: 
-    #         motion ="right"
-    #     elif count_motion < 4000:
-    #         motion = "forward"
-    #     elif count_motion < 5000:
-    #         motion = "stop"
-    #     count_motion +=1
 
-    # print("count_motion")
-    # print(count_motion)
     
 
     if  msg.buttons[3] == 1 :
