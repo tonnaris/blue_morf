@@ -203,6 +203,9 @@ def main():
             cpg_breathe.set_frequency(alpha * np.pi)
 
 
+        if pump == True:
+            arduino_control = [1,1]
+            
         if motion != "set":
             
             cpg_breathe_data_0 = np.array(cpg_breathe.update())[0] + shif_cpg_breathe
@@ -224,9 +227,6 @@ def main():
             elif breathe_state_1 == False and cpg_breathe_data_1 < 0:
                 arduino_control = [3,1]
                 breathe_state_1 = True
-
-            if pump == True:
-                arduino_control = [1,1]
 
             print("cpg_breathe_data_0 %.4f"%cpg_breathe_data_0)
         print("alpha %.4f"%alpha)
