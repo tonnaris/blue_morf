@@ -31,8 +31,8 @@ git pull
 
 after pull delete all file in devel and build file
 ```
-sudo rm -r catkin_ws/build/*
-sudo rm -r catkin_ws/devel/*
+sudo rm -r build/*
+sudo rm -r devel/*
 catkin_make
 ```
 
@@ -65,3 +65,7 @@ left --> turn left
 right --> turn right
 
 down --> walk backward
+
+RB --> start sequence
+
+LB --> flow in air

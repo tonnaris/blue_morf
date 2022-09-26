@@ -11,7 +11,7 @@ import time
 import signal
 import numpy as np
 def main():
-    global motion,speed,pub,count_motion,set_sequence
+    global motion,speed,pub,count_motion,set_sequence,pump
     pub = rospy.Publisher('arduino_control', Float32MultiArray, queue_size=1)
     pub_dynamixel = rospy.Publisher('set_position', Int32MultiArray, queue_size=1)
     rospy.init_node('main', anonymous=True)
@@ -27,7 +27,7 @@ def main():
     motion_before = "set"
     speed = "sigma"
     sigma = 0.03
-    alpha = 0.01
+
     breathe_state_0 = True
     breathe_state_1 = True
     time_t0 = time.perf_counter() # seconds
@@ -36,16 +36,42 @@ def main():
     count_change = 0
     count_motion = 0
     set_sequence = False
-    shif_cpg_breathe = 0
+    pump = False
 
-    set_duration = 0.5 # set percentage open and close valve --> 0.3 open 0.7 close
+    #----------------------------------------------------------------------------
 
-    delay = Delay()
-    delay.set_w(0.8,5)
+    # set_alpha and max_alpha must set between [0.001,0.2]. 
+    # the breathing freq. will start from set_alpha to max_alpha with change speed of rate_alpha
+    # increse alpha: fast breathing  / decreses alpha: slow breathing
+    set_alpha = 0.01 
+    alpha = set_alpha
+    min_alpha = set_alpha
+
+    max_alpha = 0.1
+
+    rate_alpha = 0.000002
+
+    # set_shif_cpg_breathe and max_shif_cpg_breathe must set between [0,0.3]
+    # the deuration will start from set_shif_cpg_breathe to max_shif_cpg_breathe with change speed of rate_cpg_breathe
+    # increse shif_cpg_breathe: let less air flow in and let more air flow out/ decreses shif_cpg_breathe: let more air flow in and let less air flow out
+    # 0 mean 50% air flow in and 50% air flow out 
+    set_shif_cpg_breathe = 0.00
+    shif_cpg_breathe = set_shif_cpg_breathe
+    min_shif_cpg_breathe = set_shif_cpg_breathe
+
+    max_shif_cpg_breathe = 0.15
+
+    rate_cpg_breathe = 0.0002
+
+
+    #----------------------------------------------------------------------------
+
+
     while not rospy.is_shutdown():
 
         rospy.Subscriber('joy', Joy, joy_cb, queue_size=1)
 
+        #----set sequence--------------------------------------------------------------------------------------
         if set_sequence == True:
             if count_motion < 1000:
                 motion = "forward"
@@ -61,7 +87,7 @@ def main():
                 motion = "stop"
             count_motion +=1
             print("count_motion: %d"%count_motion)
-
+        #--------------------------------------------------------------------------------------------------------
         
 
         if motion != "set":
@@ -158,40 +184,38 @@ def main():
 
         if motion == "set":
             arduino_control = [0,0]
-            alpha = 0.01
-            shif_cpg_breathe = 0.15
+            alpha = set_alpha
+            shif_cpg_breathe = set_shif_cpg_breathe
             time_t0 = time.perf_counter()
             cpg_breathe = CPG()
             cpg_breathe.set_frequency()
         elif motion == "stop":
-            alpha -= 0.00002
-            if alpha <= 0.01: alpha = 0.01
-            shif_cpg_breathe += 0.0002
-            if shif_cpg_breathe >= 0.15: shif_cpg_breathe = 0.15
-
-            
-     
+            alpha -= rate_alpha
+            if alpha <= min_alpha: alpha = min_alpha
+            shif_cpg_breathe -= rate_cpg_breathe
+            if shif_cpg_breathe <= min_shif_cpg_breathe: shif_cpg_breathe = min_shif_cpg_breathe
             cpg_breathe.set_frequency(alpha * np.pi)
         else:
-            alpha += 0.00001
-            if alpha >= 0.1: alpha = 0.1
-            shif_cpg_breathe -= 0.0002
-            if shif_cpg_breathe <= 0: shif_cpg_breathe = 0
-
+            alpha += rate_alpha
+            if alpha >= max_alpha: alpha = max_alpha
+            shif_cpg_breathe += rate_cpg_breathe
+            if shif_cpg_breathe >= max_shif_cpg_breathe: shif_cpg_breathe = max_shif_cpg_breathe
             cpg_breathe.set_frequency(alpha * np.pi)
 
+
         if motion != "set":
+            
             cpg_breathe_data_0 = np.array(cpg_breathe.update())[0] + shif_cpg_breathe
             cpg_breathe_data_1 = np.array(cpg_breathe.update())[1] + shif_cpg_breathe
 
             if breathe_state_0 == True and cpg_breathe_data_0 >= 0:
-                arduino_control = [1,3]
+                arduino_control = [0,3]
                 breathe_state_0 = False
                 print("----------------------------------------------------")
                 print(time.perf_counter()-time_t0)
                 time_t0 = time.perf_counter()
             elif breathe_state_0 == False and cpg_breathe_data_0 < 0:
-                arduino_control = [0,3]
+                arduino_control = [1,3]
                 breathe_state_0 = True
 
             if breathe_state_1 == True and cpg_breathe_data_1 >= 0:
@@ -200,6 +224,9 @@ def main():
             elif breathe_state_1 == False and cpg_breathe_data_1 < 0:
                 arduino_control = [3,1]
                 breathe_state_1 = True
+
+            if pump == True:
+                arduino_control = [1,1]
 
             print("cpg_breathe_data_0 %.4f"%cpg_breathe_data_0)
         print("alpha %.4f"%alpha)
@@ -218,8 +245,8 @@ def main():
         signal.signal(signal.SIGINT, keyboard_interrupt_handler)   
 
 def joy_cb(msg):
-    global motion,speed,count_motion,set_sequence
-    #print(msg.buttons)
+    global motion,speed,count_motion,set_sequence,pump
+    print(msg.buttons)
     #print(msg.axes)
 
 
@@ -242,6 +269,11 @@ def joy_cb(msg):
 
     if msg.buttons[5] == 1 :
         set_sequence = True
+    
+    if msg.buttons[4] == 1:
+        pump = True
+    else:
+        pump = False
 
 
     
