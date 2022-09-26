@@ -68,4 +68,4 @@ down --> walk backward
 
 RB --> start sequence
 
-LB --> flow in air
+LB --> flow air in 
