@@ -13,10 +13,6 @@ sudo apt-get install ros-neotic-rosserial-joy
 /dev$ ls ttyUSB*
 ```
 
-# Git
-
-git Username : tonnaris
-git Password : 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
 ## git push
 ```
 git add . && git commit -m "commit"
