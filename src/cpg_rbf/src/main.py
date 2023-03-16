@@ -27,6 +27,8 @@ def main():
     motion_before = "set"
     speed = "sigma"
     sigma = 0.03
+    MOTOR1_DATA = 0  
+    MOTOR2_DATA = 0
 
     breathe_state_0 = True
     breathe_state_1 = True
@@ -212,21 +214,24 @@ def main():
             cpg_breathe_data_1 = np.array(cpg_breathe.update())[1] + shif_cpg_breathe
 
             if breathe_state_0 == True and cpg_breathe_data_0 >= 0:
-                arduino_control = [0,3]
+                MOTOR1_DATA = 0
                 breathe_state_0 = False
                 print("----------------------------------------------------")
                 print(time.perf_counter()-time_t0)
                 time_t0 = time.perf_counter()
             elif breathe_state_0 == False and cpg_breathe_data_0 < 0:
-                arduino_control = [1,3]
+                MOTOR1_DATA = 1
                 breathe_state_0 = True
 
             if breathe_state_1 == True and cpg_breathe_data_1 >= 0:
-                arduino_control = [3,0]
+                MOTOR2_DATA = 0
                 breathe_state_1 = False
             elif breathe_state_1 == False and cpg_breathe_data_1 < 0:
-                arduino_control = [3,1]
+                MOTOR2_DATA = 1
                 breathe_state_1 = True
+       
+            arduino_control = [MOTOR1_DATA,MOTOR2_DATA]   
+             
 
             print("cpg_breathe_data_0 %.4f"%cpg_breathe_data_0)
         print("alpha %.4f"%alpha)
